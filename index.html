@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3d3a"><title>GoodHealth</title>
+<style>
+:root{--ink:#10302e;--mut:#5d7774;--bg:#eef4f2;--card:#fff;--teal:#0f8f84;--deep:#0b3d3a;--bad:#d64538;--warn:#d98a00;--ok:#1b8a5a;--line:#d5e2df}
+body.dark{--ink:#e6f1ef;--mut:#9bb5b1;--bg:#0c1a19;--card:#142927;--line:#24403d}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:env(safe-area-inset-top) 14px 90px;max-width:560px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 0 6px}h1{font-size:26px;margin:0}h2{font-size:17px;margin:18px 0 8px}
+.sub,.lbl{color:var(--mut);font-size:13px}.tab{display:none}.tab.on{display:block}
+.hero{background:var(--deep);color:#fff;border-radius:20px;padding:18px;margin:8px 0 12px}.hero .lbl{color:#b9d6d2}.big{font-size:54px;font-weight:700;line-height:1.1}.big small{font-size:16px;opacity:.7;margin-left:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}.grid .card{margin:0}
+.val{font-size:22px;font-weight:700;margin-top:2px}.val small{font-size:13px;color:var(--mut);font-weight:500}
+button,input,select{font:inherit}button{font-weight:600;border-radius:12px;padding:13px;border:2px solid var(--teal);background:var(--card);color:var(--teal);width:100%;margin-top:8px}
+button.p{background:var(--teal);color:#fff}button:disabled{opacity:.6}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--warn)}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}label{display:block;font-size:12px;color:var(--mut);margin:9px 0 3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}#msg{position:fixed;left:14px;right:14px;bottom:78px;background:var(--deep);color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;display:none;z-index:5}
+.bars{display:flex;align-items:flex-end;gap:6px;height:110px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px 8px}.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bar i{display:block;width:100%;background:var(--teal);border-radius:5px 5px 2px 2px;min-height:3px}.bar span{font-size:10px;color:var(--mut);margin-top:3px}
+.emp{color:var(--mut);font-size:14px;padding:14px;border:1px dashed var(--line);border-radius:14px}
+.fr{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}.fr b{width:112px;font-weight:500}.fr .tr{flex:1;height:14px;position:relative;background:var(--line);border-radius:7px}.fr .tr i{position:absolute;top:0;height:100%}.fr em{width:34px;text-align:right;font-style:normal;font-weight:700}
+.chip{display:inline-block;padding:2px 9px;border-radius:9px;font-size:12px;color:#fff}.c0{background:var(--ok)}.c1{background:var(--warn)}.c2{background:var(--bad)}
+.mood{display:flex;gap:6px}.mood button{font-size:26px;padding:8px;margin:0}.mood button.sel{background:var(--teal)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto}nav button{border:0;background:none;color:var(--mut);padding:6px 2px;margin:0;font-size:11px;font-weight:500}nav button.on{color:var(--teal);font-weight:700}nav span{display:block;font-size:20px}
+dialog{border:0;border-radius:18px;padding:18px;width:min(92vw,420px);background:var(--card);color:var(--ink)}dialog::backdrop{background:#0008}.li{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}.ft{font-size:12px;color:var(--mut);text-align:center;margin:18px 0}
+</style></head><body>
+<header><div><h1>GoodHealth</h1><div class="sub" id="who"></div></div><button id="setb" style="width:auto;padding:8px 14px;margin:0">Settings</button></header>
+<main>
+<section class="tab on" id="t0"><div class="hero"><div class="lbl">Wellness score (cardiac focus)</div><div class="big"><span id="sc">--</span><small>/100</small></div><div class="lbl" id="scn">Add data to see your score.</div></div>
+<div class="grid" id="hm"></div><h2>Steps, last 7 days</h2><div id="ht"></div><h2>Alerts</h2><div id="al"></div></section>
+
+<section class="tab" id="t1"><h2>Add food</h2><input id="fq" placeholder="Search food (rice, dosa, egg...)" autocomplete="off"><div id="fr"></div>
+<div class="card" id="fs" style="display:none"><b id="fn"></b><div class="two"><div><label for="fg">Amount</label><input id="fg" type="number" min="0" step="any" inputmode="decimal" value="1"></div><div><label for="fu">Unit</label><select id="fu"><option>g</option><option>ml</option><option>piece</option><option>cup</option><option>bowl</option><option>tbsp</option></select></div></div>
+<label for="fm">Meal</label><select id="fm"><option>Breakfast</option><option>Lunch</option><option>Snack</option><option>Dinner</option></select><button class="p" id="fa">Add to today</button></div>
+<h2>Today</h2><div class="card" id="nt"></div><div id="nl"></div></section>
+
+<section class="tab" id="t2"><h2>Watch data</h2><button class="p" id="syncb">Sync from Health Connect</button>
+<div class="card" style="margin-top:10px"><div class="two"><div><label for="b_hr">Heart rate</label><input id="b_hr" type="number" inputmode="numeric"></div><div><label for="b_rhr">Resting HR</label><input id="b_rhr" type="number" inputmode="numeric"></div><div><label for="b_hrv">HRV (ms)</label><input id="b_hrv" type="number" inputmode="numeric"></div><div><label for="b_spo2">SpO2 (%)</label><input id="b_spo2" type="number" inputmode="numeric"></div><div><label for="b_steps">Steps</label><input id="b_steps" type="number" inputmode="numeric"></div><div><label for="b_sleep">Sleep (hours)</label><input id="b_sleep" type="number" step="0.1" inputmode="decimal"></div></div><button id="bsave">Save manual entry</button></div>
+<h2>Trend</h2><select id="tsel"><option value="steps">Steps</option><option value="rhr">Resting HR</option><option value="hrv">HRV</option><option value="sleep">Sleep (h)</option></select><div id="tb" style="margin-top:8px"></div>
+<h2>Blood report</h2><div class="card"><div class="two"><div><label for="l_chol">Total cholesterol</label><input id="l_chol" type="number" inputmode="decimal"></div><div><label for="l_ldl">LDL</label><input id="l_ldl" type="number" inputmode="decimal"></div><div><label for="l_hdl">HDL</label><input id="l_hdl" type="number" inputmode="decimal"></div><div><label for="l_tg">Triglycerides</label><input id="l_tg" type="number" inputmode="decimal"></div><div><label for="l_glu">Fasting glucose</label><input id="l_glu" type="number" inputmode="decimal"></div><div><label for="l_a1c">HbA1c (%)</label><input id="l_a1c" type="number" step="0.1" inputmode="decimal"></div><div><label for="l_sys">BP systolic</label><input id="l_sys" type="number" inputmode="numeric"></div><div><label for="l_dia">BP diastolic</label><input id="l_dia" type="number" inputmode="numeric"></div><div><label for="l_hb">Hemoglobin</label><input id="l_hb" type="number" step="0.1" inputmode="decimal"></div></div><button id="lsave">Save blood report</button></div><div id="lr"></div></section>
+
+<section class="tab" id="t3"><h2>How is your mood today?</h2><div class="mood" id="md"></div>
+<div class="card" style="margin-top:12px"><div class="two"><div><label for="m_screen">Screen time (hours)</label><input id="m_screen" type="number" step="0.1" inputmode="decimal"></div><div><label for="m_night">Night phone use (min)</label><input id="m_night" type="number" inputmode="numeric"></div></div><button id="msave">Save signals</button></div>
+<div class="card" id="me"></div><div class="lbl">Indicative estimate from your own inputs and watch data. Not a diagnosis.</div></section>
+
+<section class="tab" id="t4"><div class="hero"><div class="lbl">Why this score?</div><div class="big"><span id="sc2">--</span><small>/100</small></div></div><div class="card" id="ix"></div><h2>Recommendations</h2><div id="rc"></div>
+<h2>Reports</h2><button class="p" id="pdfb">Download report (PDF)</button><button id="jsb">Export data (JSON)</button><button id="csb">Export data (CSV)</button></section>
+</main><div id="msg" role="status"></div>
+<nav id="nav"><button class="on" data-t="0"><span>🏠</span>Home</button><button data-t="1"><span>🥗</span>Nutrition</button><button data-t="2"><span>❤️</span>Body</button><button data-t="3"><span>🧠</span>Mind</button><button data-t="4"><span>📊</span>Insights</button></nav>
+
+<dialog id="pd"><form method="dialog" id="pf"><h2 style="margin-top:0">Your profile</h2><label for="p_n">Name</label><input id="p_n" required><div class="two"><div><label for="p_a">Age</label><input id="p_a" type="number" min="5" max="110" required></div><div><label for="p_s">Sex</label><select id="p_s"><option value="F">Female</option><option value="M">Male</option></select></div><div><label for="p_h">Height (cm)</label><input id="p_h" type="number" min="80" max="250" required></div><div><label for="p_w">Weight (kg)</label><input id="p_w" type="number" min="20" max="300" required></div></div><label for="p_g">Goal</label><select id="p_g"><option>Heart health</option><option>Lose weight</option><option>Build fitness</option><option>Better sleep</option></select><button class="p" type="submit">Save</button></form></dialog>
+<dialog id="sd"><h2 style="margin-top:0">Settings</h2><button id="s_prof">Edit profile</button><button id="s_dark">Toggle dark mode</button><button id="s_demo">Load demo data (for presentation)</button><button id="s_clear" style="color:var(--bad);border-color:var(--bad)">Clear all data</button><p class="lbl">GoodHealth is not a medical device. Scores are indicative and not a diagnosis.</p><button id="s_close" class="p">Close</button></dialog>
+<script src="jspdf.umd.min.js"></script>
+<script>
+(function(){
+var K='goodhealth_v2',cap=window.Capacitor,pc={};function $(i){return document.getElementById(i)}
+function ld(){try{return JSON.parse(localStorage.getItem(K))||{}}catch(e){return{}}}
+var S=ld();S.days=S.days||{};S.meals=S.meals||[];S.labs=S.labs||[];S.base=S.base||{};
+function sv(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function dk(d){d=d||new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function tdy(){var k=dk();return S.days[k]=S.days[k]||{}}
+function nat(){return !!(cap&&cap.isNativePlatform&&cap.isNativePlatform())}
+function pl(n){if(pc[n])return pc[n];if(!cap)return null;return pc[n]=(cap.Plugins&&cap.Plugins[n])||(cap.registerPlugin?cap.registerPlugin(n):null)}
+var mt;function say(t){var m=$('msg');m.textContent=t;m.style.display='block';clearTimeout(mt);mt=setTimeout(function(){m.style.display='none'},4500)}
+function cl(v,a,b){return Math.max(a,Math.min(b,v))}function n0(v){return v==null||isNaN(v)?'--':Math.round(v)}
+function fs(m){return m==null?'--':Math.floor(m/60)+'h '+Math.round(m%60)+'m'}
+function last7(f){var o=[];for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var r=S.days[dk(d)]||{};o.push({d:d.toLocaleDateString(undefined,{weekday:'short'}),v:f(r)})}return o}
+function bars(a){if(!a.some(function(x){return x.v!=null&&x.v>0}))return'<div class="emp">No history yet. Sync your watch or add data on the Body tab.</div>';var mx=Math.max.apply(null,a.map(function(x){return x.v||0}).concat([1]));return'<div class="bars">'+a.map(function(x){return'<div class="bar" title="'+n0(x.v)+'"><i style="height:'+Math.max(3,(x.v||0)/mx*100)+'%"></i><span>'+x.d+'</span></div>'}).join('')+'</div>'}
+
+// ---- foods: name|kcal|carb|protein|fat per 100g|piece grams ----
+var FD='Rice (cooked)|130|28|2.7|0.3|160;Chapati|297|46|9|7|40;Idli|130|28|4|0.4|40;Dosa|168|29|4|3.7|80;Sambar|50|7|3|1.5|200;Dal (cooked)|116|20|9|0.4|200;Chicken curry|150|4|16|8|200;Chicken breast|165|0|31|3.6|120;Fish curry|130|3|15|6|200;Egg (boiled)|155|1|13|11|50;Paneer|265|1.2|18|20|50;Curd|61|4.7|3.5|3.3|150;Milk|61|4.8|3.2|3.3|240;Banana|89|23|1.1|0.3|120;Apple|52|14|0.3|0.2|180;Oats (cooked)|71|12|2.5|1.5|200;Bread slice|265|49|9|3.2|30;Biryani|170|22|7|6|250;Upma|150|22|3|5|200;Poha|130|25|2.6|2.5|200;Almonds|579|22|21|50|10;Tea with milk|40|6|1|1.2|150;Samosa|262|24|4.7|17|60;Vegetable salad|20|4|1|0.2|100;Potato curry|110|15|2|5|200;Sugar|387|100|0|0|4'.split(';').map(function(r){var p=r.split('|');return{n:p[0],k:+p[1],c:+p[2],p:+p[3],f:+p[4],u:+p[5]}});
+var sel=null;
+$('fq').oninput=function(){var q=this.value.toLowerCase().trim(),r=$('fr');if(!q){r.innerHTML='';return}var m=FD.filter(function(f){return f.n.toLowerCase().indexOf(q)>-1}).slice(0,6);r.innerHTML=m.length?m.map(function(f){return'<button data-f="'+FD.indexOf(f)+'">'+f.n+' ('+f.k+' kcal/100g)</button>'}).join(''):'<div class="emp">No match. Try another name.</div>'};
+$('fr').onclick=function(e){var b=e.target.closest('button');if(!b)return;sel=FD[+b.dataset.f];$('fn').textContent=sel.n;$('fs').style.display='block';$('fr').innerHTML='';$('fq').value=''};
+function grams(f,a,u){return a*({g:1,ml:1,piece:f.u,cup:240,bowl:200,tbsp:15}[u]||1)}
+$('fa').onclick=function(){var a=parseFloat($('fg').value);if(!sel||!(a>0)){say('Pick a food and enter an amount above 0.');return}var g=grams(sel,a,$('fu').value),x=g/100;S.meals.push({d:dk(),t:$('fm').value,n:sel.n,g:g,k:sel.k*x,c:sel.c*x,p:sel.p*x,f:sel.f*x});sv();$('fs').style.display='none';sel=null;rN();rH();say('Added.')};
+function tm(){return S.meals.filter(function(m){return m.d===dk()})}
+function rN(){var m=tm(),t={k:0,c:0,p:0,f:0};m.forEach(function(x){t.k+=x.k;t.c+=x.c;t.p+=x.p;t.f+=x.f});var e=t.c*4+t.p*4+t.f*9||1;
+$('nt').innerHTML='<div class="val">'+n0(t.k)+' <small>kcal of ~'+n0(target())+'</small></div><div style="display:flex;height:14px;border-radius:7px;overflow:hidden;margin:8px 0;background:var(--line)"><i style="width:'+t.c*4/e*100+'%;background:#0f8f84"></i><i style="width:'+t.p*4/e*100+'%;background:#2a6fdb"></i><i style="width:'+t.f*9/e*100+'%;background:#e0a100"></i></div><div class="lbl">Carbs '+n0(t.c)+' g (teal) | Protein '+n0(t.p)+' g (blue) | Fat '+n0(t.f)+' g (amber)</div>';
+$('nl').innerHTML=m.length?m.map(function(x,i){return'<div class="li"><span>'+x.t+': '+x.n+' ('+n0(x.g)+' g)</span><span>'+n0(x.k)+' kcal <a href="#" data-x="'+i+'">remove</a></span></div>'}).join(''):'<div class="emp">Nothing logged today. Search a food above.</div>'}
+$('nl').onclick=function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();var m=tm()[+a.dataset.x];S.meals.splice(S.meals.indexOf(m),1);sv();rN();rH()};
+function target(){var p=S.profile;if(!p)return 2000;return(10*p.w+6.25*p.h-5*p.a+(p.s==='M'?5:-161))*1.3}
+
+// ---- blood report ----
+var LB={chol:['Total cholesterol','mg/dL',[200,240]],ldl:['LDL','mg/dL',[100,160]],hdl:['HDL','mg/dL',null],tg:['Triglycerides','mg/dL',[150,200]],glu:['Fasting glucose','mg/dL',[100,126]],a1c:['HbA1c','%',[5.7,6.5]],sys:['BP systolic','mmHg',[120,140]],dia:['BP diastolic','mmHg',[80,90]],hb:['Hemoglobin','g/dL',null]};
+function st(k,v){if(v==null)return null;if(k==='hdl')return v>=40?0:v>=35?1:2;if(k==='hb')return v>=12?0:v>=10?1:2;var r=LB[k][2];return v<r[0]?0:v<r[1]?1:2}
+var SN=['Normal','Borderline','High'];
+$('lsave').onclick=function(){var e={d:dk()},any=0;Object.keys(LB).forEach(function(k){var v=parseFloat($('l_'+k).value);if(!isNaN(v)&&v>0){e[k]=v;any=1}});if(!any){say('Enter at least one value.');return}S.labs.push(e);sv();Object.keys(LB).forEach(function(k){$('l_'+k).value=''});rL();rH();say('Blood report saved.')};
+function lastLab(k,skip){for(var i=S.labs.length-1;i>=0;i--)if(S.labs[i][k]!=null){if(skip){skip--;continue}return S.labs[i][k]}return null}
+function rL(){var h='';Object.keys(LB).forEach(function(k){var v=lastLab(k);if(v==null)return;var p=lastLab(k,1),s=st(k,v);h+='<div class="li"><span>'+LB[k][0]+': <b>'+v+'</b> '+LB[k][1]+(p!=null?' <span class="lbl">(prev '+p+(v>p?' ↑':v<p?' ↓':' =')+')</span>':'')+'</span><span class="chip c'+s+'">'+SN[s]+'</span></div>'});$('lr').innerHTML=h?'<div class="card">'+h+'</div>':'<div class="emp">No blood report yet. Enter values from your lab report above.</div>'}
+
+// ---- score (rule-based, weighted, vs personal baseline) ----
+function score(){var d=tdy(),b=S.base,f=[];function add(k,n,p,t){f.push({k:k,n:n,p:Math.round(p*10)/10,t:t})}
+if(d.rhr!=null&&b.rhr){var x=d.rhr-b.rhr;add('rhr','Resting heart rate',cl(-x*.75,-10,5),'Resting heart rate is '+Math.abs(Math.round(x))+' bpm '+(x>0?'above':'below')+' your baseline')}
+if(d.hrv!=null&&b.hrv){var y=d.hrv-b.hrv;add('hrv','HRV',cl(y*.2,-8,5),'HRV is '+Math.abs(Math.round(y))+' ms '+(y<0?'below':'above')+' your baseline')}
+if(d.sleep!=null){var h=d.sleep/60;add('sleep','Sleep',cl((h-7)*4,-12,3),'You slept '+h.toFixed(1)+' h (target 7 to 9 h)')}
+if(d.steps!=null)add('steps','Steps',cl((d.steps-8000)/800,-10,6),n0(d.steps)+' steps vs a goal of 8,000');
+if(d.spo2!=null)add('spo2','Blood oxygen',d.spo2<95?-(95-d.spo2)*3:1,'SpO2 is '+n0(d.spo2)+'%');
+var m=tm();if(m.length){var k=0,fa=0;m.forEach(function(z){k+=z.k;fa+=z.f*9});var r=k/target();var pn=-cl(Math.abs(r-1)*15,0,8);if(fa/k>.35)pn-=3;add('food','Nutrition',pn,'Calories are '+Math.round(r*100)+'% of your estimate'+(fa/k>.35?' and fat is over 35% of energy':''))}
+var ll=[['ldl','LDL cholesterol',[3,6]],['tg','Triglycerides',[1,3]],['glu','Fasting glucose',[3,6]],['a1c','HbA1c',[2,4]],['sys','Blood pressure',[2,4]],['hdl','HDL cholesterol',[1,3]]];
+ll.forEach(function(a){var v=lastLab(a[0]);if(v==null)return;var s=st(a[0],v);add(a[0],a[1],s===0?1:-a[2][s-1],a[1]+' is '+v+' ('+SN[s].toLowerCase()+')')});
+if(d.mood!=null)add('mood','Mood',(d.mood-3)*2.5,'Mood check-in is '+d.mood+' of 5');
+if(d.night!=null&&d.night>60)add('night','Night phone use',-3,'Night phone use is '+d.night+' min');
+if(d.screen!=null&&d.screen>6)add('screen','Screen time',-2,'Screen time is '+d.screen+' h');
+var t=f.reduce(function(a,z){return a+z.p},0);return{s:f.length?Math.round(cl(70+t,0,100)):null,f:f}}
+var RC={rhr:'Try easy cardio and lower stress today; keep an eye on resting heart rate over the next few days.',hrv:'Prioritise recovery: sleep earlier, limit caffeine and alcohol, try 5 minutes of slow breathing.',sleep:'Aim for 7 to 9 hours. Fix a bedtime and keep screens off for the last hour.',steps:'Add a 20 minute walk after a meal to move toward 8,000 steps.',spo2:'Low readings can be a watch error. Re-measure at rest; see a doctor if it stays low.',food:'Balance your plate: more vegetables, dal and lean protein, less fried food.',ldl:'Cut saturated fat and fried food; add oats, nuts and fibre. Discuss with your doctor.',tg:'Reduce sugar, sweets and refined carbs; limit alcohol.',glu:'Cut sugary drinks and favour whole grains; get a follow-up test.',a1c:'Discuss HbA1c with your doctor and watch refined carbs.',sys:'Reduce salt, stay active, and recheck your blood pressure.',hdl:'Regular exercise and healthy fats (nuts, fish) can raise HDL.',mood:'Take a short walk, talk to someone you trust, and keep a regular routine.',night:'Set a wind-down time and keep the phone away from the bed.',screen:'Take regular screen breaks and get outside for some daylight.'};
+
+// ---- renders ----
+function mc(l,v,u){return'<div class="card"><div class="lbl">'+l+'</div><div class="val">'+v+(u?' <small>'+u+'</small>':'')+'</div></div>'}
+function rH(){var d=tdy(),r=score();$('sc').textContent=$('sc2').textContent=r.s==null?'--':r.s;$('scn').textContent=r.s==null?'Add data to see your score.':'Computed on your phone, compared with your own baseline.';
+var kc=0;tm().forEach(function(m){kc+=m.k});$('hm').innerHTML=mc('Heart rate',n0(d.hr),'bpm')+mc('Resting HR',n0(d.rhr),'bpm')+mc('HRV',n0(d.hrv),'ms')+mc('SpO2',n0(d.spo2),'%')+mc('Steps',d.steps==null?'--':Math.round(d.steps).toLocaleString(),'')+mc('Sleep',fs(d.sleep),'')+mc('Calories',n0(kc),'kcal')+mc('Mood',d.mood?['','😞','😕','😐','🙂','😄'][d.mood]:'--','');
+$('ht').innerHTML=bars(last7(function(x){return x.steps}));
+var al=[];r.f.forEach(function(x){if(x.p<=-4)al.push(x.t)});$('al').innerHTML=al.length?al.map(function(a){return'<div class="card" style="border-left:4px solid var(--bad)">'+a+'</div>'}).join(''):'<div class="emp">No alerts.</div>';
+$('who').textContent=S.profile?'Hello, '+S.profile.n:'';rI(r);rM();rT()}
+function rI(r){var h='';if(!r.f.length){$('ix').innerHTML='<div class="emp">No factors yet. Add data in Body, Nutrition or Mind.</div>';$('rc').innerHTML='';return}
+var s=r.f.slice().sort(function(a,b){return Math.abs(b.p)-Math.abs(a.p)});s.forEach(function(x){var w=Math.min(50,Math.abs(x.p)/12*50);h+='<div class="fr"><b>'+x.n+'</b><div class="tr"><i style="'+(x.p>=0?'left:50%;background:var(--ok)':'right:50%;background:var(--bad)')+';width:'+w+'%"></i></div><em>'+(x.p>0?'+':'')+x.p+'</em></div><div class="lbl" style="margin:-4px 0 6px">'+x.t+'</div>'});
+$('ix').innerHTML='<div class="lbl">Starts at 70. Each bar shows points added or removed.</div>'+h;var rc=s.filter(function(x){return x.p<0&&RC[x.k]});$('rc').innerHTML=rc.length?rc.map(function(x){return'<div class="card"><b>'+x.n+'</b><div>'+RC[x.k]+'</div></div>'}).join(''):'<div class="emp">Nothing to fix right now. Keep it up.</div>'}
+function rT(){var f=$('tsel').value,g={steps:function(x){return x.steps},rhr:function(x){return x.rhr},hrv:function(x){return x.hrv},sleep:function(x){return x.sleep!=null?x.sleep/60:null}}[f];$('tb').innerHTML=bars(last7(g))}
+$('tsel').onchange=rT;
+function rM(){var d=tdy();document.querySelectorAll('#md button').forEach(function(b){b.className=+b.dataset.m===d.mood?'sel':''});if(d.screen!=null)$('m_screen').value=d.screen;if(d.night!=null)$('m_night').value=d.night;
+var b=S.base,sl=d.sleep!=null?d.sleep/60:7;if(d.mood==null&&d.screen==null&&d.rhr==null){$('me').innerHTML='<div class="emp">Log your mood and screen time to see an estimate.</div>';return}
+var s=40+((d.screen||4)-4)*4+(d.night||0)*.15+((d.rhr&&b.rhr)?(d.rhr-b.rhr)*1.5:0)-((d.hrv&&b.hrv)?(d.hrv-b.hrv)*.5:0)+(3-(d.mood||3))*6-(sl-7)*3;s=Math.round(cl(s,0,100));var lv=s<35?'Low':s<65?'Moderate':'High';
+$('me').innerHTML='<div class="val">Stress estimate: '+lv+' <small>('+s+'/100)</small></div><div class="lbl">Based on mood, screen time, night phone use, sleep, resting HR and HRV.</div>'}
+$('md').innerHTML=[1,2,3,4,5].map(function(i){return'<button data-m="'+i+'" aria-label="Mood '+i+'">'+['','😞','😕','😐','🙂','😄'][i]+'</button>'}).join('');
+$('md').onclick=function(e){var b=e.target.closest('button');if(!b)return;tdy().mood=+b.dataset.m;sv();rH()};
+$('msave').onclick=function(){var d=tdy(),a=parseFloat($('m_screen').value),n=parseFloat($('m_night').value);if(!isNaN(a))d.screen=a;if(!isNaN(n))d.night=n;sv();rH();say('Saved.')};
+$('bsave').onclick=function(){var d=tdy(),m={hr:'b_hr',rhr:'b_rhr',hrv:'b_hrv',spo2:'b_spo2',steps:'b_steps'},any=0;Object.keys(m).forEach(function(k){var v=parseFloat($(m[k]).value);if(!isNaN(v)&&v>0){d[k]=v;any=1}});var s=parseFloat($('b_sleep').value);if(!isNaN(s)&&s>0){d.sleep=s*60;any=1}if(!any){say('Enter at least one value.');return}setBase();sv();rH();say('Saved.')};
+function setBase(){var ks=Object.keys(S.days).sort(),r=[],h=[];ks.forEach(function(k){if(S.days[k].rhr)r.push(S.days[k].rhr);if(S.days[k].hrv)h.push(S.days[k].hrv)});function av(a){return a.length?a.reduce(function(x,y){return x+y},0)/a.length:null}if(!S.base.rhr&&r.length)S.base.rhr=av(r);if(!S.base.hrv&&h.length)S.base.hrv=av(h)}
+
+// ---- Health Connect sync ----
+function mins(a){var iv=[];a.forEach(function(s){if(s.sleepState==='awake'||s.sleepState==='inBed')return;var x=new Date(s.startDate).getTime(),y=new Date(s.endDate).getTime();if(y>x)iv.push([x,y])});iv.sort(function(p,q){return p[0]-q[0]});var t=0,c=null;iv.forEach(function(x){if(!c){c=x.slice();return}if(x[0]<=c[1])c[1]=Math.max(c[1],x[1]);else{t+=c[1]-c[0];c=x.slice()}});if(c)t+=c[1]-c[0];return t/60000}
+async function lt(H,t,hrs){var e=new Date(),s=new Date(e-hrs*3600000),r=await H.readSamples({dataType:t,startDate:s.toISOString(),endDate:e.toISOString(),limit:1,ascending:false});return r&&r.samples&&r.samples.length?r.samples[0].value:null}
+$('syncb').onclick=async function(){var b=this;b.disabled=true;try{if(!nat())throw new Error('Health Connect works only in the installed Android app.');var H=pl('Health');if(!H)throw new Error('Health plugin missing in this build.');say('Checking Health Connect...');var av=await H.isAvailable();if(!av.available)throw new Error('Health Connect is not available'+(av.reason?': '+av.reason:'')+'. Install or update it from the Play Store.');
+var T=['steps','heartRate','restingHeartRate','heartRateVariability','oxygenSaturation','sleep'],au=await H.requestAuthorization({read:T}),ok=(au&&au.readAuthorized)||[];if(!ok.length)throw new Error('No permission granted. Tap Sync again and allow access.');
+var d=tdy(),n=0,now=new Date();async function tr(t,fn){if(ok.indexOf(t)<0)return;try{await fn()}catch(e){console.warn(t,e)}}
+await tr('heartRate',async function(){var v=await lt(H,'heartRate',48);if(v!=null){d.hr=v;n++}});await tr('restingHeartRate',async function(){var v=await lt(H,'restingHeartRate',168);if(v!=null){d.rhr=v;n++}});
+await tr('heartRateVariability',async function(){var v=await lt(H,'heartRateVariability',168);if(v!=null){d.hrv=v;n++}});await tr('oxygenSaturation',async function(){var v=await lt(H,'oxygenSaturation',168);if(v!=null){d.spo2=v;n++}});
+await tr('sleep',async function(){var r=await H.readSamples({dataType:'sleep',startDate:new Date(now-36*3600000).toISOString(),endDate:now.toISOString(),limit:500}),m=mins((r&&r.samples)||[]);if(m>0){d.sleep=m;n++}});
+var st0=new Date(now);st0.setDate(st0.getDate()-6);st0.setHours(0,0,0,0);
+await tr('steps',async function(){var r=await H.queryAggregated({dataType:'steps',startDate:st0.toISOString(),endDate:now.toISOString(),bucket:'day',aggregation:'sum'});(r.samples||[]).forEach(function(x){var k=dk(new Date(x.startDate));S.days[k]=S.days[k]||{};S.days[k].steps=x.value||0});n++});
+await tr('restingHeartRate',async function(){var r=await H.queryAggregated({dataType:'restingHeartRate',startDate:st0.toISOString(),endDate:now.toISOString(),bucket:'day',aggregation:'average'});(r.samples||[]).forEach(function(x){if(x.value){var k=dk(new Date(x.startDate));S.days[k]=S.days[k]||{};S.days[k].rhr=x.value}})});
+setBase();S.syncedAt=Date.now();sv();rH();say(n?'Synced '+n+' data types.':'Connected, but no recent data. Sync your watch app and check it writes to Health Connect.')}catch(e){say(e&&e.message?e.message:String(e))}finally{b.disabled=false}};
+
+// ---- reports ----
+async function out(name,data,b64,mime){if(nat()){var F=pl('Filesystem'),H=pl('Share');if(!F||!H)throw new Error('Filesystem or Share plugin missing.');var o={path:name,data:data,directory:'CACHE'};if(!b64)o.encoding='utf8';var r=await F.writeFile(o);await H.share({title:name,url:r.uri,dialogTitle:'Save or send'});say('Ready. Choose Drive, Files or any app.')}else{var a=document.createElement('a');a.href=b64?'data:'+mime+';base64,'+data:URL.createObjectURL(new Blob([data],{type:mime}));a.download=name;a.click()}}
+function guard(fn){return async function(){var b=this;b.disabled=true;try{await fn()}catch(e){if(!/cancel/i.test(String(e&&e.message||e)))say('Failed: '+(e&&e.message?e.message:e))}finally{b.disabled=false}}}
+$('pdfb').onclick=guard(async function(){var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error('PDF library failed to load.');var doc=new J({unit:'pt',format:'a4'}),y=56,r=score(),d=tdy();
+function ln(t,sz,gr){if(y>780){doc.addPage();y=56}doc.setFontSize(sz||11);doc.setTextColor(gr||0);var w=doc.splitTextToSize(t,500);doc.text(w,48,y);y+=w.length*(sz||11)*1.35+4}
+ln('GoodHealth report',24);ln('Created '+new Date().toLocaleString()+(S.profile?'  |  '+S.profile.n+', '+S.profile.a+' y':''),10,110);y+=8;
+ln('Wellness score: '+(r.s==null?'no data':r.s+' / 100'),16);y+=4;r.f.forEach(function(x){ln((x.p>0?'+':'')+x.p+'  '+x.t,11)});y+=8;
+ln('Today',14);ln('Heart rate '+n0(d.hr)+' bpm | Resting HR '+n0(d.rhr)+' | HRV '+n0(d.hrv)+' ms | SpO2 '+n0(d.spo2)+'% | Steps '+n0(d.steps)+' | Sleep '+fs(d.sleep));
+var kc=0;tm().forEach(function(m){kc+=m.k});ln('Calories logged: '+n0(kc)+' kcal');y+=8;
+var lb=[];Object.keys(LB).forEach(function(k){var v=lastLab(k);if(v!=null)lb.push(LB[k][0]+' '+v+' '+LB[k][1]+' ('+SN[st(k,v)]+')')});if(lb.length){ln('Blood report',14);lb.forEach(function(t){ln(t)});y+=8}
+var rc=r.f.filter(function(x){return x.p<0&&RC[x.k]});if(rc.length){ln('Recommendations',14);rc.forEach(function(x){ln('- '+x.n+': '+RC[x.k])})}
+y+=10;ln('For wellbeing tracking only. Not a medical device and not a diagnosis.',9,120);
+await out('GoodHealth-report-'+dk()+'.pdf',doc.output('datauristring').split(',')[1],true,'application/pdf')});
+$('jsb').onclick=guard(async function(){await out('GoodHealth-data-'+dk()+'.json',JSON.stringify(S,null,2),false,'application/json')});
+$('csb').onclick=guard(async function(){var c='date,heart_rate,resting_hr,hrv,spo2,steps,sleep_min,mood,screen_h,night_min\n';Object.keys(S.days).sort().forEach(function(k){var x=S.days[k];c+=[k,x.hr,x.rhr,x.hrv,x.spo2,x.steps,x.sleep,x.mood,x.screen,x.night].map(function(v){return v==null?'':v}).join(',')+'\n'});await out('GoodHealth-data-'+dk()+'.csv',c,false,'text/csv')});
+
+// ---- profile, settings, demo ----
+function opP(){var p=S.profile||{};$('p_n').value=p.n||'';$('p_a').value=p.a||'';$('p_s').value=p.s||'F';$('p_h').value=p.h||'';$('p_w').value=p.w||'';$('p_g').value=p.g||'Heart health';$('pd').showModal()}
+$('pf').onsubmit=function(){S.profile={n:$('p_n').value.trim(),a:+$('p_a').value,s:$('p_s').value,h:+$('p_h').value,w:+$('p_w').value,g:$('p_g').value};sv();rH();rN()};
+$('setb').onclick=function(){$('sd').showModal()};$('s_close').onclick=function(){$('sd').close()};$('s_prof').onclick=function(){$('sd').close();opP()};
+function dm(){document.body.classList.toggle('dark',!!S.dark)}$('s_dark').onclick=function(){S.dark=!S.dark;sv();dm()};
+$('s_demo').onclick=function(){var r=Math.random;for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);S.days[dk(d)]={hr:70+Math.round(r()*14),rhr:62+Math.round(r()*8),hrv:48+Math.round(r()*16),spo2:96+Math.round(r()*3),steps:5500+Math.round(r()*7000),sleep:330+Math.round(r()*140),mood:2+Math.round(r()*3),screen:3+Math.round(r()*5),night:Math.round(r()*80)}}S.base={rhr:63,hrv:58};
+S.labs=[{d:dk(),chol:215,ldl:128,hdl:46,tg:140,glu:96,a1c:5.4,sys:122,dia:80,hb:13.2}];var f=function(i,t,a){var x=FD[i],g=x.u*a;S.meals.push({d:dk(),t:t,n:x.n,g:g,k:x.k*g/100,c:x.c*g/100,p:x.p*g/100,f:x.f*g/100})};f(2,'Breakfast',3);f(21,'Breakfast',1);f(0,'Lunch',1.5);f(5,'Lunch',1);f(6,'Dinner',1);f(1,'Dinner',2);S.demo=true;sv();$('sd').close();all();say('Demo data loaded. Clear it in Settings when you finish.')};
+$('s_clear').onclick=function(){if(!confirm('Delete all data on this phone?'))return;var p=S.profile,dk0=S.dark;S={days:{},meals:[],labs:[],base:{},profile:p,dark:dk0};sv();$('sd').close();all();say('Data cleared.')};
+document.getElementById('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;document.querySelectorAll('.tab').forEach(function(t,i){t.className='tab'+(i==b.dataset.t?' on':'')});document.querySelectorAll('#nav button').forEach(function(x){x.className=x===b?'on':''});window.scrollTo(0,0)};
+function all(){rH();rN();rL()}dm();all();if(!S.profile)opP();
+})();
+</script></body></html>
